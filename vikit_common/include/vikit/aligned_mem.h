@@ -16,6 +16,7 @@
 #include <string.h>     // memset
 #include <cassert>
 #include <cstdlib>
+#include <Eigen/Core>
 
 namespace vk {
 namespace aligned_mem {
@@ -64,12 +65,14 @@ namespace aligned_mem {
 
   inline void * aligned_alloc(size_t count, size_t alignment){
     void * mem = NULL;
-    assert(posix_memalign(&mem, alignment, count) == 0);
+    // assert(posix_memalign(&mem, alignment, count) == 0);
+    mem = Eigen::internal::aligned_malloc(sizeof(char)*count);
     return mem;
   }
 
   inline void aligned_free(void * memory) {
-    free(memory);
+    Eigen::internal::aligned_free(memory);
+    // free(memory);
   }
 
   template <class T>
@@ -80,8 +83,9 @@ namespace aligned_mem {
 
   template <class T>
   inline void aligned_free(T * memory, size_t count){
-    placement_delete<T>::free(memory, count);
-    aligned_free(memory);
+    Eigen::internal::aligned_free(memory);
+    // placement_delete<T>::free(memory, count);
+    // aligned_free(memory);
   }
 
   template<class T> inline void memfill(T* data, int n, const T val)

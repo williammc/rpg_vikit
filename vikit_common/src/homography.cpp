@@ -31,7 +31,8 @@ void Homography::
 calcFromPlaneParams(const Vector3d& n_c1, const Vector3d& xyz_c1)
 {
   double d = n_c1.dot(xyz_c1); // normal distance from plane to KF
-  H_c2_from_c1 = T_c2_from_c1.rotation_matrix() + (T_c2_from_c1.translation()*n_c1.transpose())/d;
+  Eigen::Matrix3d rot = T_c2_from_c1.rotationMatrix();
+  H_c2_from_c1 =  rot + (T_c2_from_c1.translation()*n_c1.transpose())/d;
 }
 
 void Homography::
@@ -83,7 +84,7 @@ computeSE3fromMatches()
     return false;
   computeMatchesInliers();
   findBestDecomposition();
-  T_c2_from_c1 = decompositions.front().T;
+  T_c2_from_c1 = decompositions.front().pose;
   return true;
 }
 
@@ -195,12 +196,12 @@ decompose()
   {
     Matrix3d R = s * U * decompositions[i].R * V.transpose();
     Vector3d t = U * decompositions[i].t;
-    decompositions[i].T = Sophus::SE3(R, t);
+    decompositions[i].pose = Sophus::SE3(R, t);
   }
   return true;
 }
 
-bool operator<(const HomographyDecomposition lhs, const HomographyDecomposition rhs)
+bool operator<(const HomographyDecomposition& lhs, const HomographyDecomposition& rhs)
 {
   return lhs.score < rhs.score;
 }
@@ -259,8 +260,8 @@ findBestDecomposition()
     double adSampsonusScores[2];
     for(size_t i=0; i<2; i++)
     {
-      Sophus::SE3 T = decompositions[i].T;
-      Matrix3d Essential = T.rotation_matrix() * sqew(T.translation());
+      Sophus::SE3 T = decompositions[i].pose;
+      Matrix3d Essential = T.rotationMatrix() * sqew(T.translation());
       double dSumError = 0;
       for(size_t m=0; m < fts_c1.size(); m++ )
       {

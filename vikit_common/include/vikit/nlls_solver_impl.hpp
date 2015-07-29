@@ -288,7 +288,7 @@ void vk::NLLSSolver<D, T>::setRobustCostFunction(
 template <int D, typename T>
 void vk::NLLSSolver<D, T>::setPrior(
     const T&  prior,
-    const Matrix<double, D, D>&  Information)
+    const Eigen::Matrix<double, D, D>&  Information)
 {
   have_prior_ = true;
   prior_ = prior;

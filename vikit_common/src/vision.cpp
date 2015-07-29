@@ -6,7 +6,7 @@
  */
 
 #include <vikit/vision.h>
-
+#include <cstdint>
 #if __SSE2__
 # include <emmintrin.h>
 #elif __ARM_NEON__
