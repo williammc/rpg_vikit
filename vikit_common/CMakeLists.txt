@@ -4,10 +4,7 @@ CMAKE_MINIMUM_REQUIRED (VERSION 2.8.3)
 #SET(CMAKE_BUILD_TYPE Release) # Release, RelWithDebInfo
 SET(CMAKE_VERBOSE_MAKEFILE OFF)
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/CMakeModules/")
-SET(USE_ROS FALSE) # Set False if you want to build this package without Catkin
-
-include(CMakerCommonUtil)
-cmaker_common_build_setting()
+option(VIKIT_USE_ROS "Use ROS" FALSE) # Set False if you want to build this package without Catkin
 
 # # Set build flags. Set IS_ARM on odroid board as environment variable
 # SET(CMAKE_CXX_FLAGS "-Wall -D_LINUX -D_REENTRANT -march=native -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unknown-pragmas")
@@ -25,11 +22,8 @@ cmaker_common_build_setting()
 
 # Add plain cmake packages 
 FIND_PACKAGE(OpenCV REQUIRED)
-# FIND_PACKAGE(Eigen REQUIRED)
-set(Eigen_INCLUDE_DIRS ${SVO_ROOT}/external/eigen)
-cmaker_print_status("Eigen_INCLUDE_DIRS:${Eigen_INCLUDE_DIRS}")
+FIND_PACKAGE(Eigen REQUIRED)
 # FIND_PACKAGE(Sophus REQUIRED)
-set(Sophus_INCLUDE_DIRS ${SVO_ROOT}/external/sophus)
 
 # Include dirs
 INCLUDE_DIRECTORIES(
@@ -39,7 +33,7 @@ INCLUDE_DIRECTORIES(
   ${Sophus_INCLUDE_DIRS}
 )
 
-IF(USE_ROS)
+IF(VIKIT_USE_ROS)
   FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp cmake_modules)
   LIST(APPEND INCLUDE_DIRECTORIES ${catkin_INCLUDE_DIRS})
   catkin_package(
@@ -72,7 +66,7 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
   ${Sophus_LIBRARIES}
   ${catkin_LIBRARIES})
 
-IF(USE_ROS)
+IF(VIKIT_USE_ROS)
   TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${catkin_LIBRARIES})
 ENDIF()
 
@@ -89,7 +83,7 @@ TARGET_LINK_LIBRARIES(test_vk_common_patch_score ${PROJECT_NAME})
 
 ################################################################################
 # Create the vikit_commonConfig.cmake file for other cmake projects.
-IF(NOT USE_ROS)
+IF(NOT VIKIT_USE_ROS)
   GET_TARGET_PROPERTY( FULL_LIBRARY_NAME ${PROJECT_NAME} LOCATION )
   SET(vikit_common_LIBRARIES ${FULL_LIBRARY_NAME} )
   SET(vikit_common_LIBRARY_DIR ${PROJECT_BINARY_DIR} )
