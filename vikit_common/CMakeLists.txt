@@ -24,11 +24,10 @@ option(VIKIT_USE_ROS "Use ROS" FALSE) # Set False if you want to build this pack
 FIND_PACKAGE(OpenCV REQUIRED)
 FIND_PACKAGE(Eigen REQUIRED)
 # FIND_PACKAGE(Sophus REQUIRED)
-
 # Include dirs
 INCLUDE_DIRECTORIES(
   include
-  ${Eigen_INCLUDE_DIRS}
+  ${EIGEN_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
   ${Sophus_INCLUDE_DIRS}
 )
